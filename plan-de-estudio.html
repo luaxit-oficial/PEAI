@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PEAI · Plan de Estudio con IA</title>
+<style>
+:root{--bg:#f3f4fb;--c:#fff;--t:#161a2b;--m:#6b7390;--p:#6d5df6;--p2:#22d3ee;--ok:#16a34a;--bad:#e11d48;--b:#e5e8f4;--sh:0 8px 30px rgba(60,60,140,.10)}
+:root[data-theme=dark]{--bg:#0b0d1a;--c:#151930;--t:#eef0fb;--m:#9aa3c4;--b:#262c4d;--sh:0 8px 30px rgba(0,0,0,.4)}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;font:16px/1.65 'Segoe UI',system-ui,sans-serif;background:radial-gradient(900px 400px at 10% -10%,rgba(109,93,246,.18),transparent),radial-gradient(700px 400px at 100% 0,rgba(34,211,238,.14),transparent),var(--bg);color:var(--t);min-height:100vh}
+main{max-width:780px;margin:0 auto;padding:16px 16px 90px}
+header{display:flex;align-items:center;gap:12px;padding:6px 0 14px}
+.logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--p),var(--p2));display:grid;place-items:center;color:#fff;font-weight:900;font-size:1.3rem;box-shadow:0 6px 18px rgba(109,93,246,.45)}
+header h1{margin:0;font-size:1.6rem;letter-spacing:.12em;line-height:1}header small{color:var(--m)}
+a.btn{display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:var(--c);color:var(--t);border:1px solid var(--b);border-radius:12px;padding:12px 20px;font-weight:600}
+details{background:var(--bg);border:1px solid var(--b);border-radius:14px;padding:12px 14px;margin:14px 0}summary{cursor:pointer;font-weight:600}details ol{padding-left:20px;margin:10px 0 4px}details li{margin:6px 0}
+label.rm{display:flex;gap:8px;align-items:center;margin-top:12px;color:var(--m);font-size:.9rem}label.rm input{width:auto}
+#bPom{margin-left:auto}#th,#bPom{background:var(--c);color:var(--t);border:1px solid var(--b);width:40px;height:40px;padding:0;border-radius:12px}
+.steps{display:flex;gap:6px;margin:4px 0 14px}.steps i{flex:1;height:6px;border-radius:6px;background:var(--b);transition:.4s}.steps i.on{background:linear-gradient(90deg,var(--p),var(--p2))}
+.steps+small{display:block;color:var(--m);margin:-8px 0 10px;font-size:.8rem}
+.card{overflow:hidden;background:var(--c);border:1px solid var(--b);border-radius:20px;padding:22px;margin:14px 0;box-shadow:var(--sh);animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(10px)}}
+h2{font-size:1.25rem;margin:.1em 0 .4em}h3{margin:1.3em 0 .3em;color:var(--p)}h4{margin:1em 0 .2em}
+input,textarea{width:100%;padding:14px;border:1.5px solid var(--b);border-radius:14px;background:var(--bg);color:var(--t);font:inherit;outline:0;transition:.2s}
+input:focus,textarea:focus{border-color:var(--p);box-shadow:0 0 0 4px rgba(109,93,246,.15)}
+button{background:linear-gradient(135deg,var(--p),#8b5cf6);color:#fff;border:0;border-radius:12px;padding:12px 20px;font:inherit;font-weight:600;cursor:pointer;transition:.15s;box-shadow:0 4px 14px rgba(109,93,246,.35)}
+button:hover{transform:translateY(-1px)}button:active{transform:scale(.97)}
+button.g{background:var(--c);color:var(--t);border:1px solid var(--b);box-shadow:none}button:disabled{opacity:.45;pointer-events:none}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.m{color:var(--m);font-size:.9rem}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap}.thumbs img{height:76px;border-radius:12px;margin-top:8px;border:2px solid var(--b)}
+.lv{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.lv button{background:var(--bg);color:var(--t);border:2px solid var(--b);text-align:left;padding:18px;box-shadow:none;border-radius:16px}.lv button:hover{border-color:var(--p)}
+.lv b{font-size:1.1rem}.lv .e{font-size:1.8rem;display:block}
+.toc{position:sticky;top:0;z-index:5;display:flex;gap:6px;overflow-x:auto;padding:10px 2px;background:var(--bg)}
+.toc a{flex:none;padding:6px 12px;border-radius:20px;border:1px solid var(--b);background:var(--c);color:var(--t);text-decoration:none;font-size:.85rem}.toc a.d{background:var(--ok);border-color:var(--ok);color:#fff}
+.topic{border-left:5px solid var(--p)}.badge{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;font-weight:700;margin-right:8px}
+.skel{height:12px;background:linear-gradient(90deg,var(--b),var(--bg),var(--b));background-size:200%;border-radius:6px;margin:10px 0;animation:sk 1.2s infinite}@keyframes sk{to{background-position:-200%}}
+.body ul{padding-left:20px}.body li{margin:4px 0}.body code{background:var(--bg);padding:1px 6px;border-radius:6px}
+.opt{display:block;width:100%;text-align:left;margin:10px 0;background:var(--bg);color:var(--t);border:2px solid var(--b);box-shadow:none;padding:14px 16px}
+.opt.sel{border-color:var(--p);background:rgba(109,93,246,.14)}
+.big{font-size:2.6rem;font-weight:800;text-align:center;background:linear-gradient(135deg,var(--p),var(--p2));-webkit-background-clip:text;background-clip:text;color:transparent}
+input[type=range]{padding:0;accent-color:var(--p);height:30px}
+#ov{position:fixed;left:12px;right:12px;bottom:16px;max-width:520px;margin:0 auto;z-index:99;display:flex;gap:12px;align-items:center;background:#1b1f3b;color:#fff;border:1.5px solid var(--p);border-radius:16px;padding:12px 16px;box-shadow:0 10px 30px rgba(0,0,0,.55);pointer-events:none}
+#ov .ico{width:40px;height:40px;font-size:1.2rem;margin:0;flex:none;border-radius:12px}#ov span{font-size:.85rem;opacity:.85}
+.ico{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,var(--p),var(--p2));display:grid;place-items:center;font-size:1.6rem;line-height:1;margin-bottom:12px;box-shadow:0 6px 18px rgba(109,93,246,.4);animation:pl 1.8s ease-in-out infinite}@keyframes pl{50%{transform:scale(1.06)}}
+.bar{height:10px;background:var(--b);border-radius:8px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--p),var(--p2));width:0;transition:.4s}
+.err{color:var(--bad)}.wrong{border-left:5px solid var(--bad)}.right{color:var(--ok)}
+.ring{width:170px;height:170px;border-radius:50%;margin:6px auto;display:grid;place-items:center;background:conic-gradient(var(--p) calc(var(--v)*1%),var(--b) 0)}
+.ring div{width:134px;height:134px;border-radius:50%;background:var(--c);display:grid;place-items:center;font-size:2rem;font-weight:800}
+.katex-display{overflow-x:auto;overflow-y:hidden;padding:6px 0;margin:.6em 0}.katex{font-size:1.08em}.opt .katex,.opt{overflow-wrap:anywhere}
+.fc{min-height:210px;display:grid;place-items:center;text-align:center;padding:24px;border-radius:20px;background:linear-gradient(135deg,var(--p),#8b5cf6);color:#fff;font-size:1.15rem;cursor:pointer;margin:14px 0;box-shadow:var(--sh);transition:.2s;overflow-wrap:anywhere}.fc.back{background:linear-gradient(135deg,#0ea5e9,#22d3ee);color:#05222b}
+.hi{display:flex;gap:8px;align-items:center;padding:10px 0;border-top:1px solid var(--b)}.hi b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hi button{padding:8px 12px;box-shadow:none}
+.ptime{font-size:2.6rem;font-weight:800;text-align:center;font-variant-numeric:tabular-nums}
+.tut{margin-top:10px;padding:12px 14px;background:var(--bg);border-radius:14px}
+</style></head><body><main>
+<header><div class="logo">P</div><div><h1>PEAI</h1><small>Plan de Estudio con IA</small></div><button id="bPom" title="Pomodoro">🍅</button><button id="th" title="Tema">🌓</button></header>
+<div class="steps" id="steps" hidden><i></i><i></i><i></i><i></i><i></i></div><small id="stl" hidden></small>
+<div class="card" id="pom" hidden><b>🍅 Pomodoro · <span id="pl">Enfoque</span></b><div class="ptime" id="pt">25:00</div><p class="m" style="text-align:center;margin:0">25 min de estudio, 5 de descanso</p><div class="row" style="justify-content:center"><button id="pS">▶ Iniciar</button><button class="g" id="pR">↺ Reiniciar</button><button class="g" id="pX">Cerrar</button></div></div>
+
+<section class="v" id="v-key"><div class="card"><div class="ico">🔑</div><h2>Bienvenido a PEAI</h2>
+<p class="m">Aprende cualquier tema con un plan hecho por IA. Para empezar necesitas una API key gratuita de Groq.</p>
+<details open><summary>¿Cómo consigo mi API key?</summary><ol>
+<li>Toca <b>Ir a Groq</b> (abajo) para abrir la consola.</li>
+<li>Crea tu cuenta gratis con Google, GitHub o correo.</li>
+<li>Entra a la sección <b>API Keys</b> del menú.</li>
+<li>Toca <b>Create API Key</b>, ponle un nombre (por ejemplo PEAI) y confirma.</li>
+<li>Copia la key (empieza con <b>gsk_</b>). Solo se muestra una vez, ¡cópiala ya!</li>
+<li>Vuelve aquí, pégala en el cuadro y toca <b>Validar y entrar</b>.</li></ol></details>
+<div class="row" style="margin:0 0 14px"><a class="btn" href="https://console.groq.com/keys" target="_blank" rel="noopener">🌐 Ir a Groq ↗</a></div>
+<input id="key" type="password" placeholder="Pega tu key: gsk_..." autocomplete="off">
+<label class="rm"><input type="checkbox" id="rem" checked> Recordar mi key en este dispositivo</label>
+<div class="row"><button id="bKey">Validar y entrar</button></div><p id="keyErr" class="err"></p></div></section>
+
+<section class="v" id="v-in" hidden><div class="card"><h2>¿Qué quieres aprender hoy?</h2>
+<textarea id="topic" rows="3" placeholder="Ej: Fotosíntesis, Derivadas, Historia de Roma… o sube tu material"></textarea>
+<div class="thumbs" id="thumbs"></div><p class="m" id="fname" style="cursor:pointer"></p>
+<div class="row"><button class="g" id="bFile">📎 Archivo (1)</button><button class="g" id="bImg">🖼️ Imágenes (máx. 3)</button></div>
+<div class="row"><button id="bGen">✨ Generar plan de estudio</button><button class="g" id="bOut" title="Borra la key guardada">🔑 Cambiar key</button></div>
+<input type="file" id="fFile" hidden accept=".pdf,.txt,.md,.csv,.json,.docx,.html">
+<input type="file" id="fImg" hidden accept="image/*" multiple></div>
+<div class="card" id="hist" hidden><h2>📂 Mis planes</h2><div id="hl"></div></div></section>
+
+<section class="v" id="v-lvl" hidden><div class="card"><h2>¿Qué tan detallado quieres el plan?</h2><div class="lv">
+<button data-l="basico"><span class="e">🌱</span><b>Básico</b><br><span class="m">5 temas · ideas esenciales</span></button>
+<button data-l="normal"><span class="e">📘</span><b>Normal</b><br><span class="m">8 temas · completo</span></button>
+<button data-l="experto"><span class="e">🚀</span><b>Experto</b><br><span class="m">12 temas · a fondo</span></button></div>
+<div class="row"><button class="g" id="bBack0">← Volver</button></div></div></section>
+
+<section class="v" id="v-plan" hidden>
+<div class="card"><b id="pTitle"></b><div class="bar" style="margin:10px 0"><i id="pBar"></i></div><p class="m" id="pStat" style="margin:0"></p></div>
+<nav class="toc" id="toc"></nav><div id="topics"></div>
+<div class="card" id="endBox" hidden><h2>🎉 ¡Plan completo!</h2><p class="m" id="studied"></p>
+<div class="row"><button id="bExam">📝 Iniciar prueba</button></div><div class="row"><button class="g" id="bFc">🃏 Flashcards</button><button class="g" id="bCs">📋 Hoja de repaso</button><button class="g" id="bDl">⬇️ Descargar</button></div>
+<h3>💬 Pregúntale al tutor</h3><textarea id="tq" rows="2" placeholder="¿Tienes una duda sobre el plan?"></textarea>
+<div class="row"><button class="g" id="bTut">Preguntar</button></div><div id="tOut"></div></div></section>
+
+<section class="v" id="v-fc" hidden><div class="card"><div id="fcBox"></div><div class="row"><button class="g" onclick="show('v-plan')">← Plan</button></div></div></section>
+<section class="v" id="v-cs" hidden><div class="card"><h2>📋 Hoja de repaso</h2><div class="body" id="csOut"></div><div class="row"><button id="bCp">📄 Copiar</button><button class="g" onclick="show('v-plan')">← Plan</button></div></div></section>
+<section class="v" id="v-ready" hidden><div class="card"><h2>¿Qué tan preparado te sientes?</h2><p class="m">Sé honesto: la IA ajusta tu examen según tu respuesta.</p>
+<div class="big" id="rv">5.0</div><input type="range" id="rs" min="0" max="10" step="0.1" value="5">
+<p class="m" id="rl" style="text-align:center"></p>
+<div class="row"><button id="bReady">Continuar</button><button class="g" id="bBack1">← Plan</button></div></div></section>
+
+<section class="v" id="v-gap" hidden><div class="card"><h2 id="gapT"></h2><p class="m" id="gapF"></p>
+<textarea id="gapTxt" rows="3" placeholder="Cuéntame qué te falta…"></textarea>
+<div class="row"><button id="bGap">Explicar más</button><button class="g" id="bBack2">← Plan</button></div><div id="gapOut" class="body"></div></div></section>
+
+<section class="v" id="v-warm" hidden><div class="card"><h2>🧩 Pregunta de comprobación</h2><p id="wq"></p>
+<textarea id="wa" rows="3" placeholder="Escribe tu respuesta…"></textarea><div class="row"><button id="bWarm">Enviar respuesta</button></div></div></section>
+
+<section class="v" id="v-load" hidden><div class="card"><div class="ico">🧠</div><h2 id="lT"></h2><div class="bar"><i id="lBar"></i></div></div></section>
+
+<section class="v" id="v-exam" hidden><div class="card"><div class="bar"><i id="eBar"></i></div><p class="m"><span id="eN"></span> · ⏱ <span id="eT">0:00</span></p><h2 id="eQ"></h2><div id="eO"></div>
+<div class="row"><button id="bNext" disabled>Siguiente →</button></div></div></section>
+
+<section class="v" id="v-res" hidden><div class="card"><div class="ring" id="ring"><div id="score"></div></div><h2 id="scoreH" style="text-align:center"></h2><p class="m" id="scoreT" style="text-align:center"></p>
+<div class="row" style="justify-content:center"><button id="bRetry" hidden>🔁 Repetir las falladas</button><button class="g" id="bAgain">← Volver al plan</button><button class="g" id="bNew">Nuevo tema</button></div></div><div id="wrongs"></div></section>
+</main>
+<div id="ov" hidden><div class="ico">🧠</div><div><b>Pensando…</b><br><span id="ovT"></span></div></div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script>
+const $=s=>document.querySelector(s),URL_='https://api.groq.com/openai/v1/chat/completions';
+const PT=['llama-3.3-70b-versatile','openai/gpt-oss-120b','qwen/qwen3-32b','openai/gpt-oss-20b','llama-3.1-8b-instant'],PV=['meta-llama/llama-4-maverick-17b-128e-instruct','meta-llama/llama-4-scout-17b-16e-instruct'];
+const S={key:'',imgs:[],file:null,fileText:'',ctx:'',level:'normal',topics:[],cont:[],done:new Set(),ready:5,n:20,qs:[],ans:[],i:0,t0:0,tl:[],vl:[]};
+function pick(ids){const bad=/whisper|tts|guard|orpheus|allam|compound|playai|safeguard/i;const ok=ids.filter(i=>!bad.test(i));if(!ids.length){S.tl=[...PT];S.vl=[...PV];return}
+ S.tl=[...PT.filter(i=>ids.includes(i)),...ok.filter(i=>!PT.includes(i)&&!/llama-4|vision/i.test(i))];S.vl=[...PV.filter(i=>ids.includes(i)),...ok.filter(i=>/llama-4|vision/i.test(i)&&!PV.includes(i))]}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const STEP={'v-in':1,'v-lvl':2,'v-plan':3,'v-fc':3,'v-cs':3,'v-ready':4,'v-gap':4,'v-warm':4,'v-load':4,'v-exam':4,'v-res':5},SL=['','1 · Material','2 · Nivel','3 · Plan de estudio','4 · Prueba','5 · Resultado'];
+function show(id){window.scrollTo(0,0);if(id=='v-in')histRender();document.querySelectorAll('.v').forEach(e=>e.hidden=e.id!==id);const n=STEP[id]||0;$('#steps').hidden=$('#stl').hidden=!n;document.querySelectorAll('#steps i').forEach((e,k)=>e.classList.toggle('on',k<n));$('#stl').textContent=SL[n]}
+$('#th').onclick=()=>{const d=document.documentElement;d.dataset.theme=d.dataset.theme=='dark'?'light':'dark'};
+if(matchMedia('(prefers-color-scheme:dark)').matches)document.documentElement.dataset.theme='dark';
+async function think(sec){$('#ov').hidden=false;for(let s=Math.ceil(sec);s>0;s--){$('#ovT').textContent='Límite alcanzado. Continúo solo en '+Math.floor(s/60)+':'+String(s%60).padStart(2,'0');await sleep(1000)}$('#ov').hidden=true}
+async function groq(messages,o={}){const L=o.vis?S.vl:S.tl;
+ for(let tries=0;;tries++){let r;if(!L.length)throw new Error('Tu cuenta de Groq no tiene un modelo disponible para esto.');
+  try{r=await fetch(URL_,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+S.key},body:JSON.stringify({model:L[0],messages,temperature:o.t??.4,max_tokens:(o.max||3000)+1000,...(o.json?{response_format:{type:'json_object'}}:{})})})}catch(e){if(tries>6)throw e;await think(8);continue}
+  if(r.status==429||r.status>=500){let w=parseFloat(r.headers.get('retry-after'));if(!w){const j=await r.clone().json().catch(()=>({}));const m=(j.error?.message||'').match(/try again in (?:(\d+)m)?\s*([\d.]+)s/i);w=m?(+(m[1]||0))*60+parseFloat(m[2])+1:20}await think(Math.max(w,3));continue}
+  const j=await r.json();if(!r.ok){const m=j.error?.message||'Error '+r.status;if(/model/i.test(m)&&/(does not exist|decommission|no access|not found|not supported)/i.test(m)){L.shift();continue}throw new Error(m)}
+  let t=(j.choices[0].message.content||'').replace(/<think>[\s\S]*?<\/think>/g,'');
+  if(o.json){try{return JSON.parse(t)}catch(e){try{return JSON.parse(t.replace(/\\(?!["\\\/bfnrtu])/g,'\\\\'))}catch(e2){}if(tries>3)throw new Error('Respuesta inválida');continue}}
+  return t}}
+async function login(k,silent){
+ try{const r=await fetch('https://api.groq.com/openai/v1/models',{headers:{Authorization:'Bearer '+k}});
+  if(r.status==401||r.status==403){try{localStorage.removeItem('peai_key')}catch(e){}$('#keyErr').textContent=silent?'Tu key guardada ya no es válida. Pega una nueva.':'Groq rechazó la key (error '+r.status+'). Revisa que esté completa y activa.';return false}
+  if(!r.ok&&r.status!=429){const j=await r.json().catch(()=>({}));$('#keyErr').textContent='Groq respondió error '+r.status+': '+(j.error?.message||'sin detalle');return false}
+  const j=await r.json().catch(()=>({}));pick((j.data||[]).map(m=>m.id));S.key=k;show('v-in');return true}
+ catch(e){$('#keyErr').textContent='No pude conectar con Groq ('+e.message+'). Revisa tu internet.';return false}}
+$('#bKey').onclick=async()=>{const k=$('#key').value.replace(/\s/g,'');$('#keyErr').textContent='';if(!k)return;$('#bKey').disabled=true;$('#bKey').textContent='Validando…';
+ if(await login(k,false)&&$('#rem').checked){try{localStorage.setItem('peai_key',k)}catch(e){}}
+ $('#bKey').disabled=false;$('#bKey').textContent='Validar y entrar'};
+$('#bOut').onclick=()=>{try{localStorage.removeItem('peai_key')}catch(e){}S.key='';$('#key').value='';show('v-key')};
+$('#bFile').onclick=()=>$('#fFile').click();$('#bImg').onclick=()=>$('#fImg').click();
+function draw(){$('#thumbs').innerHTML=S.imgs.map((x,i)=>`<img src="${x.url}" title="Quitar" onclick="S.imgs.splice(${i},1);draw()">`).join('');$('#fname').textContent=S.file?'📄 '+S.file.name+' (toca para quitar)':'';$('#fname').onclick=()=>{S.file=null;S.fileText='';draw()}}
+function shrink(f){return new Promise(res=>{const im=new Image;im.onload=()=>{const k=Math.min(1,1800/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.85))};im.src=URL.createObjectURL(f)})}
+$('#fImg').onchange=async e=>{S.file=null;S.fileText='';for(const f of e.target.files){if(S.imgs.length>=3){alert('Máximo 3 imágenes');break}S.imgs.push({url:await shrink(f)})}e.target.value='';draw()};
+$('#fFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;S.imgs=[];S.file=f;$('#fname').textContent='Leyendo archivo…';
+ try{const n=f.name.toLowerCase();let t='';
+  if(n.endsWith('.pdf')){pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';const d=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise;for(let p=1;p<=d.numPages;p++){const pg=await d.getPage(p);t+=(await pg.getTextContent()).items.map(i=>i.str).join(' ')+'\n'}}
+  else if(n.endsWith('.docx'))t=(await mammoth.extractRawText({arrayBuffer:await f.arrayBuffer()})).value;else t=await f.text();
+  S.fileText=t.trim();if(!S.fileText)throw 0}catch(x){alert('No pude leer texto de ese archivo.');S.file=null;S.fileText=''}
+ e.target.value='';draw()};
+$('#bGen').onclick=()=>{if(!$('#topic').value.trim()&&!S.imgs.length&&!S.file)return alert('Escribe un tema o sube algo.');show('v-lvl')};
+$('#bBack0').onclick=()=>show('v-in');
+document.querySelectorAll('#v-lvl .lv button').forEach(b=>b.onclick=()=>{S.level=b.dataset.l;start()});
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+const MB=/\\\[([\s\S]+?)\\\]|\$\$([\s\S]+?)\$\$/g,MI=/\\\(([\s\S]+?)\\\)|\$([^\s$][^$\n]*?[^\s$]|[^\s$])\$/g;
+function kx(f,d){try{if(!window.katex)throw 0;return katex.renderToString(f.trim(),{displayMode:d,throwOnError:false,strict:false})}catch(e){return '<code>'+esc(f)+'</code>'}}
+function ri(s){s=String(s??'');let o='',last=0;s.replace(new RegExp(MB.source+'|'+MI.source,'g'),(m,a,b,c,d,i)=>{o+=esc(s.slice(last,i))+kx(a||b||c||d,false);last=i+m.length;return m});return o+esc(s.slice(last))}
+function md(t){const M=[];t=t.replace(MB,(m,a,b)=>{M.push('<div class="mb">'+kx(a||b,true)+'</div>');return '\n@@M'+(M.length-1)+'@@\n'});
+ t=t.replace(MI,(m,a,b)=>{M.push(kx(a||b,false));return '@@M'+(M.length-1)+'@@'});
+ let o='',l=0;const inl=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/(^|[^*])\*([^*\s][^*]*?)\*(?!\*)/g,'$1<i>$2</i>').replace(/`(.+?)`/g,'<code>$1</code>');
+ for(const ln of t.split('\n')){const x=ln.trim(),li=/^([-*•]|\d+\.)\s+/.test(x);if(l&&!li&&!/^@@M\d+@@$/.test(x)){o+='</ul>';l=0}if(!x)continue;
+  if(/^@@M\d+@@$/.test(x))o+=x;
+  else if(li){if(!l){o+='<ul>';l=1}o+='<li>'+inl(x.replace(/^([-*•]|\d+\.)\s+/,''))+'</li>'}
+  else if(/^#{1,2}\s/.test(x))o+='<h3>'+inl(x.replace(/^#+\s*/,''))+'</h3>';else if(/^#{3,}\s/.test(x))o+='<h4>'+inl(x.replace(/^#+\s*/,''))+'</h4>';else o+='<p>'+inl(x)+'</p>'}
+ return (o+(l?'</ul>':'')).replace(/@@M(\d+)@@/g,(m,i)=>M[+i])}
+const SYS='Eres PEAI, un profesor universitario excepcional y paciente. Explicas en español claro, con rigor, analogías y ejemplos concretos. Nunca inventas datos: si el material del estudiante lo trae, te basas en él. Nunca dejas respuestas a medias. FÓRMULAS: escríbelas en LaTeX, en línea con \\( ... \\) y en bloque con \\[ ... \\]; cada fórmula COMPLETA en una sola línea (matrices incluidas, usando \\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix} en esa misma línea), nunca partidas en varias líneas ni dentro de bloques de código. No uses $ para fórmulas.';
+function upStudied(){const n=S.done.size,t=S.topics.length;$('#studied').textContent=`Has marcado ${n} de ${t} temas como estudiados.`}
+async function start(){
+ show('v-plan');$('#topics').innerHTML='';$('#toc').innerHTML='';$('#endBox').hidden=true;S.done=new Set();$('#pBar').style.width='0';$('#pTitle').textContent='Leyendo tu material…';$('#pStat').textContent='';
+ try{let ctx=$('#topic').value.trim();if(S.fileText)ctx+='\n\nARCHIVO:\n'+S.fileText.slice(0,14000);
+  for(let i=0;i<S.imgs.length;i++){$('#pStat').textContent=`Analizando imagen ${i+1} de ${S.imgs.length}…`;
+   ctx+=`\n\nIMAGEN ${i+1}:\n`+await groq([{role:'user',content:[{type:'text',text:'Analiza esta imagen con máxima precisión. Transcribe TODO el texto exactamente (respetando fórmulas, números y listas) y describe en detalle diagramas, tablas, gráficos y elementos visuales. Responde en español.'},{type:'image_url',image_url:{url:S.imgs[i].url}}]}],{vis:1,max:2000,t:.1})}
+  S.ctx=ctx.slice(0,16000);const nT={basico:5,normal:8,experto:12}[S.level];$('#pStat').textContent='Diseñando el plan…';
+  const r=await groq([{role:'system',content:SYS+' Responde solo JSON.'},{role:'user',content:`Material del estudiante:\n${S.ctx.slice(0,9000)}\n\nDiseña el índice de un plan de estudio nivel ${S.level} con EXACTAMENTE ${nT} temas, ordenados de lo básico a lo avanzado, sin repetir contenido y cubriendo todo el material. JSON: {"titulo":"...","temas":[{"titulo":"...","descripcion":"una línea con el objetivo","minutos":numero}]}`}],{json:1,max:1800});
+  S.topics=r.temas;S.cont=[];$('#pTitle').textContent='📚 '+(r.titulo||'Plan de estudio');
+  $('#toc').innerHTML=S.topics.map((t,i)=>`<a href="#t${i}" id="c${i}">${i+1}</a>`).join('');
+  $('#topics').innerHTML=S.topics.map((t,i)=>`<div class="card topic" id="t${i}"><h2><span class="badge">${i+1}</span>${esc(t.titulo)}</h2><p class="m">${esc(t.descripcion||'')} ${t.minutos?'· ⏱ ~'+(+t.minutos||10)+' min':''}</p><div class="body"><div class="skel"></div><div class="skel" style="width:85%"></div><div class="skel" style="width:60%"></div></div></div>`).join('');
+  const words={basico:300,normal:550,experto:900}[S.level];
+  for(let i=0;i<S.topics.length;i++){$('#pStat').textContent=`Generando contenido ${i+1} de ${S.topics.length}… ve leyendo, sigo en segundo plano`;$('#pBar').style.width=(i/S.topics.length*100)+'%';
+   const idx=S.topics.map((t,k)=>`${k+1}. ${t.titulo}`).join('\n');
+   const c=await groq([{role:'system',content:SYS},{role:'user',content:`Plan completo:\n${idx}\n\nMaterial base:\n${S.ctx.slice(0,7000)}\n\nEscribe el contenido COMPLETO del tema ${i+1}: "${S.topics[i].titulo}" (~${words} palabras) en Markdown, con EXACTAMENTE estas secciones (##): 🎯 Objetivos (2-3 viñetas), 📖 Explicación (clara, por pasos, con **términos clave** en negrita), 💡 Ejemplo práctico, ⚠️ Errores comunes, ✅ Ideas clave (3 viñetas). No repitas otros temas.`}],{max:3500,t:.5});
+   S.cont[i]=c;$(`#t${i} .body`).innerHTML=bodyHTML(i,c)}
+  $('#pBar').style.width='100%';$('#pStat').textContent='Todos los temas listos ✔';upStudied();savePlan();$('#endBox').hidden=false}
+ catch(e){$('#pStat').innerHTML='<span class="err">Error: '+esc(e.message)+'</span> <button onclick="start()">Reintentar</button>'}}
+function mark(i,b){const d=S.done.has(i);d?S.done.delete(i):S.done.add(i);$('#c'+i).classList.toggle('d',!d);b.textContent=d?'☑️ Marcar como estudiado':'✅ Estudiado';upStudied()}
+$('#bDl').onclick=()=>{const t='# '+$('#pTitle').textContent+'\n\n'+S.topics.map((x,i)=>`# ${i+1}. ${x.titulo}\n\n${S.cont[i]||''}`).join('\n\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/markdown'}));a.download='plan-peai.md';a.click()};
+$('#bTut').onclick=async()=>{const q=$('#tq').value.trim();if(!q)return;$('#bTut').disabled=true;const d=document.createElement('div');d.className='tut body';d.innerHTML='<b>Tú:</b> '+esc(q)+'<p class="m">Pensando…</p>';$('#tOut').prepend(d);$('#tq').value='';
+ try{const a=await groq([{role:'system',content:SYS+' Responde la duda de forma breve y precisa usando el curso.'},{role:'user',content:`Curso:\n${S.cont.join('\n').slice(0,10000)}\n\nDuda: ${q}`}],{max:1200,t:.4});d.innerHTML='<b>Tú:</b> '+esc(q)+'<hr style="border:0;border-top:1px solid var(--b)">'+md(a)}catch(e){d.innerHTML='<span class="err">'+esc(e.message)+'</span>'}$('#bTut').disabled=false};
+$('#bExam').onclick=()=>{rl();show('v-ready')};$('#bBack1').onclick=$('#bBack2').onclick=$('#bAgain').onclick=()=>show('v-plan');$('#bNew').onclick=()=>{S.imgs=[];S.file=null;S.fileText='';$('#topic').value='';draw();show('v-in')};
+function rl(){const v=+$('#rs').value;$('#rv').textContent=v.toFixed(1);$('#rl').textContent=v<3?'Estoy empezando 🌱':v<5?'Aún me falta bastante':v<7?'Voy bien, con dudas':v<9?'Bastante preparado 💪':'Domino el tema 🚀'}
+$('#rs').oninput=rl;
+$('#bReady').onclick=async()=>{S.ready=+$('#rs').value;$('#bReady').disabled=true;
+ try{const r=await groq([{role:'user',content:`Un estudiante terminó un curso de ${S.topics.length} temas nivel ${S.level} y se califica ${S.ready}/10 de preparación. Decide cuántas preguntas de opción múltiple debe tener su examen (entre 10 y 175): más preguntas si está más preparado y el plan es más extenso. JSON: {"n":numero}`}],{json:1,max:50});S.n=Math.max(10,Math.min(175,Math.round(+r.n||30)))}catch(e){S.n=30}
+ $('#bReady').disabled=false;if(S.ready<5)gap('Aún no estás listo. ¿Qué no entendiste o qué quieres ampliar?','');else warm()};
+function gap(t,f){$('#gapT').textContent=t;$('#gapF').textContent=f;$('#gapTxt').value='';$('#gapOut').innerHTML='';show('v-gap')}
+$('#bGap').onclick=async()=>{const q=$('#gapTxt').value.trim();if(!q)return;$('#bGap').disabled=true;$('#gapOut').innerHTML='<p class="m">Preparando una explicación a tu medida…</p>';
+ try{const c=await groq([{role:'system',content:SYS},{role:'user',content:`Curso:\n${S.cont.join('\n').slice(0,9000)}\n\nEl estudiante dice: "${q}". Explícaselo con otro enfoque, una analogía, un ejemplo nuevo y un mini repaso final.`}],{max:2500,t:.5});
+  $('#gapOut').innerHTML='<hr>'+md(c)+'<div class="row"><button onclick="show(\'v-ready\')">Ya estoy listo, volver a calificarme</button></div>'}catch(e){$('#gapOut').innerHTML='<p class="err">'+esc(e.message)+'</p>'}$('#bGap').disabled=false};
+async function warm(){show('v-load');$('#lT').textContent='Preparando tu pregunta de comprobación…';$('#lBar').style.width='30%';
+ try{const k=Math.floor(Math.random()*S.cont.length);S.wTopic=k;const r=await groq([{role:'user',content:`Texto:\n${S.cont[k].slice(0,3500)}\n\nCrea UNA pregunta abierta, que requiera comprender (no memorizar), contestable en 1-3 frases, basada en este texto. JSON: {"q":"..."}`}],{json:1,max:300});
+  S.wq=r.q;$('#wq').innerHTML=ri(r.q);$('#wa').value='';show('v-warm')}catch(e){alert(e.message);show('v-ready')}}
+$('#bWarm').onclick=async()=>{const a=$('#wa').value.trim();if(!a)return;$('#bWarm').disabled=true;$('#bWarm').textContent='Revisando…';
+ try{const r=await groq([{role:'user',content:`Texto de referencia:\n${S.cont[S.wTopic].slice(0,3500)}\n\nPregunta: ${S.wq}\nRespuesta del estudiante: ${a}\n\n¿Es correcta en lo esencial (sé justo, no exijas las mismas palabras)? JSON: {"correcta":true/false,"feedback":"breve y amable, en español"}`}],{json:1,max:300,t:.1});
+  if(r.correcta)buildExam();else gap('Casi. Aún no estás listo. ¿Qué no entendiste o qué quieres ampliar?',r.feedback||'')}catch(e){alert(e.message)}$('#bWarm').disabled=false;$('#bWarm').textContent='Enviar respuesta'};
+async function buildExam(){show('v-load');S.qs=[];const B=15,nb=Math.ceil(S.n/B)+2,all=S.cont.join('\n'),seen=new Set();
+ try{for(let b=0;b<nb&&S.qs.length<S.n;b++){$('#lT').textContent=`Creando preguntas… ${S.qs.length} de ${S.n}`;$('#lBar').style.width=(S.qs.length/S.n*100)+'%';
+  const need=Math.min(B,S.n-S.qs.length),st=(b*5500)%Math.max(all.length-5500,1);
+  const r=await groq([{role:'system',content:'Creas preguntas de examen de opción múltiple (A-D) rigurosas en español. Para matemáticas usa notación simple en texto/Unicode (x², √, ≤, ∑, ∫, ×), SIN LaTeX ni barras invertidas: un solo acierto claro, distractores plausibles, mezcla de comprensión y aplicación. Solo JSON.'},{role:'user',content:`Texto:\n${all.slice(st,st+6500)}\n\nCrea ${need} preguntas distintas basadas SOLO en este texto, con 4 opciones. Lote ${b+1}. JSON: {"preguntas":[{"q":"...","o":["...","...","...","..."],"c":indice_correcto_0a3,"e":"explicación breve de por qué"}]}`}],{json:1,max:3500,t:.5});
+  for(const p of r.preguntas||[]){if(!p.q||!Array.isArray(p.o)||p.o.length!=4||seen.has(p.q))continue;seen.add(p.q);const o=p.o.map((t,i)=>({t,ok:i==p.c}));o.sort(()=>Math.random()-.5);S.qs.push({q:p.q,o,e:p.e||''});if(S.qs.length>=S.n)break}}
+  if(!S.qs.length)throw new Error('No se generaron preguntas');begin()}catch(e){alert(e.message);show('v-ready')}}
+let tm;function begin(){S.i=0;S.ans=[];S.t0=Date.now();clearInterval(tm);tm=setInterval(()=>{const s=Math.floor((Date.now()-S.t0)/1000);$('#eT').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0')},1000);q()}
+function q(){const p=S.qs[S.i];show('v-exam');$('#eN').textContent=`Pregunta ${S.i+1} de ${S.qs.length}`;$('#eBar').style.width=(S.i/S.qs.length*100)+'%';$('#eQ').innerHTML=ri(p.q);$('#bNext').disabled=true;$('#bNext').textContent=S.i==S.qs.length-1?'Finalizar ✔':'Siguiente →';
+ $('#eO').innerHTML=p.o.map((o,i)=>`<button class="opt" data-i="${i}"><b>${'ABCD'[i]}.</b> ${ri(o.t)}</button>`).join('');
+ document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{S.ans[S.i]=+b.dataset.i;document.querySelectorAll('.opt').forEach(x=>x.classList.toggle('sel',x==b));$('#bNext').disabled=false})}
+$('#bNext').onclick=()=>{if(++S.i<S.qs.length)q();else result()};
+function result(){clearInterval(tm);const secs=Math.floor((Date.now()-S.t0)/1000);show('v-res');let ok=0,w='';S.bad=[];
+ S.qs.forEach((p,i)=>{if(p.o[S.ans[i]].ok)ok++;else{S.bad.push(p);w+=`<div class="card wrong"><b>${i+1}. ${ri(p.q)}</b><p>Tu respuesta: ${ri(p.o[S.ans[i]].t)}</p><p class="right">✔ Correcta: ${ri(p.o.find(o=>o.ok).t)}</p><p class="m">💡 ${ri(p.e)}</p></div>`}});
+ const sc=ok/S.qs.length*100;$('#ring').style.setProperty('--v',sc);$('#score').textContent=sc.toFixed(1)+'%';
+ $('#scoreH').textContent=sc>=90?'🏆 ¡Excelente!':sc>=70?'👏 ¡Muy bien!':sc>=50?'📈 Vas por buen camino':'📚 A repasar un poco más';
+ $('#scoreT').textContent=`${ok} de ${S.qs.length} correctas · ${Math.floor(secs/60)} min ${secs%60} s`;
+ $('#bRetry').hidden=!S.bad.length;$('#wrongs').innerHTML=w?'<h2>Preguntas falladas</h2>'+w:'<div class="card">🎉 ¡Sin errores!</div>'}
+$('#bRetry').onclick=()=>{S.qs=S.bad.map(p=>({...p,o:[...p.o].sort(()=>Math.random()-.5)}));begin()};
+
+function bodyHTML(i,c){return md(c)+`<div class="row"><button class="g" onclick="mark(${i},this)">☑️ Marcar como estudiado</button><button class="g" onclick="more(${i},'s',this)">🧒 Más simple</button><button class="g" onclick="more(${i},'e',this)">🔎 Más ejemplos</button></div><div id="x${i}"></div>`}
+async function more(i,m,b){b.disabled=true;const d=document.createElement('div');d.className='tut body';d.innerHTML='<p class="m">Pensando…</p>';$('#x'+i).appendChild(d);
+ const ask=m=='s'?'Explícalo de forma MUY simple, como a alguien de 12 años, con analogías cotidianas (máx. 250 palabras).':'Da 3 ejemplos nuevos y distintos a los del texto, resueltos paso a paso.';
+ try{const a=await groq([{role:'system',content:SYS},{role:'user',content:`Tema: ${S.topics[i].titulo}\n\nTexto del tema:\n${S.cont[i].slice(0,5000)}\n\n${ask}`}],{max:1800,t:.5});d.innerHTML=(m=='s'?'<b>🧒 Versión simple</b>':'<b>🔎 Más ejemplos</b>')+md(a)}catch(e){d.innerHTML='<span class="err">'+esc(e.message)+'</span>'}b.disabled=false}
+// historial
+function plans(){try{return JSON.parse(localStorage.getItem('peai_plans')||'[]')}catch(e){return[]}}
+function savePlan(){try{const a=plans();a.unshift({id:Date.now(),title:$('#pTitle').textContent,level:S.level,topics:S.topics,cont:S.cont});localStorage.setItem('peai_plans',JSON.stringify(a.slice(0,8)))}catch(e){}}
+function histRender(){const a=plans();$('#hist').hidden=!a.length;$('#hl').innerHTML=a.map(p=>`<div class="hi"><b>${esc(p.title)}</b><span class="m">${p.topics.length} temas</span><button onclick="openPlan(${p.id})">Abrir</button><button class="g" onclick="delPlan(${p.id})">🗑</button></div>`).join('')}
+function delPlan(id){try{localStorage.setItem('peai_plans',JSON.stringify(plans().filter(p=>p.id!=id)))}catch(e){}histRender()}
+function openPlan(id){const p=plans().find(x=>x.id==id);if(!p)return;S.topics=p.topics;S.cont=p.cont;S.level=p.level;S.done=new Set();show('v-plan');$('#pTitle').textContent=p.title;$('#pBar').style.width='100%';$('#pStat').textContent='Plan guardado ✔';
+ $('#toc').innerHTML=S.topics.map((t,i)=>`<a href="#t${i}" id="c${i}">${i+1}</a>`).join('');
+ $('#topics').innerHTML=S.topics.map((t,i)=>`<div class="card topic" id="t${i}"><h2><span class="badge">${i+1}</span>${esc(t.titulo)}</h2><p class="m">${esc(t.descripcion||'')} ${t.minutos?'· ⏱ ~'+(+t.minutos||10)+' min':''}</p><div class="body">${bodyHTML(i,S.cont[i])}</div></div>`).join('');upStudied();$('#endBox').hidden=false}
+// flashcards
+const F={list:[],i:0,unk:[]};
+$('#bFc').onclick=async()=>{show('v-load');$('#lT').textContent='Creando flashcards…';$('#lBar').style.width='40%';
+ try{const n={basico:12,normal:20,experto:30}[S.level]||20;const r=await groq([{role:'system',content:SYS+' Responde solo JSON.'},{role:'user',content:`Curso:\n${S.cont.join('\n').slice(0,12000)}\n\nCrea ${n} flashcards de estudio que cubran todos los temas: frente = pregunta o concepto, reverso = respuesta breve y exacta. Sin LaTeX ni barras invertidas (usa símbolos como x², √, ∑). JSON: {"t":[{"f":"...","r":"..."}]}`}],{json:1,max:3500});
+  const l=(r.t||[]).filter(x=>x.f&&x.r);if(!l.length)throw new Error('No se generaron flashcards');fcRun(l)}catch(e){alert(e.message);show('v-plan')}};
+function fcRun(l){F.list=l;F.i=0;F.unk=[];fcShow()}
+function fcShow(){show('v-fc');const L=F.list,n=L.length,box=$('#fcBox');
+ if(F.i>=n){const k=n-F.unk.length;box.innerHTML=`<h2>🃏 ¡Ronda terminada!</h2><p>Sabes <b>${k}</b> de <b>${n}</b> tarjetas.</p>`+(F.unk.length?`<div class="row"><button id="fcR">🔁 Repasar las ${F.unk.length} que no sé</button></div>`:'<p class="right">🎉 ¡Dominaste todas!</p>');if(F.unk.length)$('#fcR').onclick=()=>fcRun(F.unk.slice());return}
+ const c=L[F.i];let back=false;box.innerHTML=`<p class="m">Tarjeta ${F.i+1} de ${n}</p><div class="bar"><i style="width:${F.i/n*100}%"></i></div><div class="fc" id="fcc">${ri(c.f)}</div><p class="m" style="text-align:center">Toca la tarjeta para voltearla</p><div class="row" style="justify-content:center"><button class="g" id="fcU">🔁 Repasar</button><button id="fcK">✅ La sé</button></div>`;
+ $('#fcc').onclick=()=>{back=!back;$('#fcc').innerHTML=ri(back?c.r:c.f);$('#fcc').classList.toggle('back',back)};
+ $('#fcU').onclick=()=>{F.unk.push(c);F.i++;fcShow()};$('#fcK').onclick=()=>{F.i++;fcShow()}}
+// hoja de repaso
+$('#bCs').onclick=async()=>{show('v-load');$('#lT').textContent='Armando tu hoja de repaso…';$('#lBar').style.width='40%';
+ try{S.cs=await groq([{role:'system',content:SYS},{role:'user',content:`Curso:\n${S.cont.join('\n').slice(0,12000)}\n\nCrea una HOJA DE REPASO de una página para estudiar antes del examen, en Markdown con secciones (##): 🔑 Conceptos clave (término: definición breve), 📐 Fórmulas y reglas importantes (si aplica), 🪜 Procedimientos paso a paso, ⚡ 5 datos para recordar. Sé concisa.`}],{max:2500,t:.3});$('#csOut').innerHTML=md(S.cs);show('v-cs')}catch(e){alert(e.message);show('v-plan')}};
+$('#bCp').onclick=async()=>{try{await navigator.clipboard.writeText(S.cs);$('#bCp').textContent='✅ Copiado'}catch(e){$('#bCp').textContent='No se pudo copiar'}setTimeout(()=>$('#bCp').textContent='📄 Copiar',1500)};
+// pomodoro
+let pt=1500,pm='f',pi=null;
+function pr(){$('#pt').textContent=Math.floor(pt/60)+':'+String(pt%60).padStart(2,'0');$('#pl').textContent=pm=='f'?'Enfoque':'Descanso'}
+function beep(){try{const a=new AudioContext(),o=a.createOscillator();o.connect(a.destination);o.frequency.value=880;o.start();o.stop(a.currentTime+.4)}catch(e){}if(navigator.vibrate)navigator.vibrate(300)}
+$('#bPom').onclick=()=>{$('#pom').hidden=!$('#pom').hidden};$('#pX').onclick=()=>$('#pom').hidden=true;
+$('#pS').onclick=()=>{if(pi){clearInterval(pi);pi=null;$('#pS').textContent='▶ Seguir';return}$('#pS').textContent='⏸ Pausar';pi=setInterval(()=>{if(--pt<=0){beep();pm=pm=='f'?'d':'f';pt=pm=='f'?1500:300}pr()},1000)};
+$('#pR').onclick=()=>{clearInterval(pi);pi=null;pm='f';pt=1500;$('#pS').textContent='▶ Iniciar';pr()};
+
+show('v-key');
+(async()=>{let k='';try{k=localStorage.getItem('peai_key')||''}catch(e){}if(!k)return;$('#key').value=k;$('#bKey').disabled=true;$('#bKey').textContent='Entrando…';await login(k,true);$('#bKey').disabled=false;$('#bKey').textContent='Validar y entrar'})();
+</script></body></html>
